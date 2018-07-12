@@ -2,13 +2,17 @@ from scipy.fftpack import fft, ifft
 import numpy as np
 import matplotlib.pyplot as plt
 
+# x = signal to analyze
+# winL = window size
+# window = window type
+# H = hop size
 
-def dft(x,winL,window):
+def dft(x,winL,window,H):
     lenAudio = len(x)
     audiodft = np.array([])
 
     # Applying window and computing DFT in each frame
-    for i in range(0, (lenAudio - lenAudio % winL), winL):  # lenAudio&winL ro remove from lenAudio the last 283 samples
+    for i in range(0, (lenAudio - lenAudio % winL), H):  # lenAudio&winL ro remove from lenAudio the last 283 samples
         frame = x[i:i + winL] * window
         audiodft = np.append(audiodft, fft(frame))
 

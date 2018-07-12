@@ -28,7 +28,7 @@ window = np.ones((winL),float)
 audiodft = np.array([])
 frame = np.zeros(winL)
 
-audiodft = dft(audio,winL,window)
+audiodft = dft(audio,winL,window,winL)
 
 #Choosing a random frame to plot
 numFrame = 90
@@ -76,7 +76,7 @@ wavfile.write("waveOut.wav",fs, waveOut)
 
 nbits = 8
 
-waveOut2 = bandQuant(audiodft,winL,nbits)
+waveOut2 = bandQuant(audio,winL,nbits,winL)
 
 wavfile.write("waveOut2.wav",fs, waveOut2)
 
