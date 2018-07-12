@@ -12,6 +12,7 @@ from analSynth import dft, invDFT
 # Defining variables
 winL= 1024
 fs = 44100
+H = 0.5 #One to have NO overlap
 audio, fsaudio = sf.read('es01_m44.wav')
 print(min(abs(audio))) #normalize
 lenAudio = len(audio)
@@ -28,7 +29,8 @@ window = np.ones((winL),float)
 audiodft = np.array([])
 frame = np.zeros(winL)
 
-audiodft = dft(audio,winL,window,winL)
+overlap = 1         #we do not want overlap, so we write 0
+audiodft = dft(audio,winL,window,overlap)
 
 #Choosing a random frame to plot
 numFrame = 90
@@ -57,7 +59,7 @@ mirrordft = np.zeros(winL)
 halfDFT = np.zeros(halfWin)
 waveOut = np.array([])
 
-waveOut = invDFT(audiodft,winL,window)
+waveOut = invDFT(audiodft,winL,window,overlap)
 
 '''
 #Plotting original waveform and synthesized one
@@ -76,7 +78,7 @@ wavfile.write("waveOut.wav",fs, waveOut)
 
 nbits = 8
 
-waveOut2 = bandQuant(audio,winL,nbits,winL)
+waveOut2 = bandQuant(audio,winL,nbits,winL,window)
 
 wavfile.write("waveOut2.wav",fs, waveOut2)
 

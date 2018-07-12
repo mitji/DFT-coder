@@ -7,27 +7,33 @@ import matplotlib.pyplot as plt
 # window = window type
 # H = hop size
 
-def dft(x,winL,window,H):
+def dft(x,winL,window,overlap):
     lenAudio = len(x)
     audiodft = np.array([])
 
     # Applying window and computing DFT in each frame
-    for i in range(0, (lenAudio - lenAudio % winL), H):  # lenAudio&winL ro remove from lenAudio the last 283 samples
-        frame = x[i:i + winL] * window
+    for i in range(0, int(lenAudio/winL)):  # lenAudio&winL ro remove from lenAudio the last 283 samples
+        if overlap==0:
+            frame = x[i*winL:(i+1)*winL] * window
+        else:
+            frame = x[int(i*0.5*winL):int((i*0.5 + 1) * winL)] * window
         audiodft = np.append(audiodft, fft(frame))
 
     return audiodft
 
 
-def invDFT(dft,winL,window):
+def invDFT(dft,winL,window,overlap):
     waveOut = np.array([])
     halfWin = int(winL/2)
-    for i in range(0, (len(dft)), winL):
-        halfDFT = dft[i:i + halfWin]
+    for i in range(0, int(len(dft)/winL)):
+        if overlap==0:
+            halfDFT = dft[i*winL:(i*winL)+halfWin]
+        else:
+            halfDFT = dft[int(i*0.5*winL):int(i*0.5*winL)+halfWin]
         invHalfDFT = halfDFT[::-1]
         mirrordft = np.append(halfDFT, invHalfDFT.conj())
-        np.shape(halfDFT)
         waveOut = np.append(waveOut, (ifft(mirrordft).real)*window)
+
 
 
     return waveOut

@@ -1,8 +1,12 @@
 from scipy.fftpack import fft, ifft
 import numpy as np
 from quantimaxmin import quantimaxmin
+from analSynth import dft
 
-def bandQuant(audiodft,winL,nbits): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
+
+def bandQuant(x,winL,nbits,H, window): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
+
+    audiodft = dft(x, winL, window, H)
 
     halfX = np.array([])
     newX = np.array([])
@@ -15,7 +19,7 @@ def bandQuant(audiodft,winL,nbits): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
     A4 = A1/8
     A5 = A1/16
 
-    for i in range(0,len(audiodft), winL):
+    for i in range(0,len(audiodft), H):
 
         frame = audiodft[i:i + winL]
 
