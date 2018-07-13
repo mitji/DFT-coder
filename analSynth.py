@@ -5,14 +5,14 @@ import matplotlib.pyplot as plt
 # x = signal to analyze
 # winL = window size
 # window = window type
-# H = hop size
+# overlap = boolean to apply overlap-add or not. If we decide to apply it, we make a hop size 1/2 of winL (window size)
 
 def dft(x,winL,window,overlap):
     lenAudio = len(x)
     audiodft = np.array([])
 
     # Applying window and computing DFT in each frame
-    for i in range(0, int(lenAudio/winL)):  # lenAudio&winL ro remove from lenAudio the last 283 samples
+    for i in range(0, int(lenAudio/winL)):  
         if overlap==0:
             frame = x[i*winL:(i+1)*winL] * window
         else:
@@ -30,11 +30,10 @@ def invDFT(dft,winL,window,overlap):
             halfDFT = dft[i*winL:(i*winL)+halfWin]
         else:
             halfDFT = dft[int(i*0.5*winL):int(i*0.5*winL)+halfWin]
+        
         invHalfDFT = halfDFT[::-1]
         mirrordft = np.append(halfDFT, invHalfDFT.conj())
         waveOut = np.append(waveOut, (ifft(mirrordft).real)*window)
-
-
 
     return waveOut
 

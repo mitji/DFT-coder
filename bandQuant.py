@@ -4,9 +4,9 @@ from quantimaxmin import quantimaxmin
 from analSynth import dft
 
 
-def bandQuant(x,winL,nbits,H, window): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
+def bandQuant(x,winL,nbits,window, overlap): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
 
-    audiodft = dft(x, winL, window, H)
+    audiodft = dft(x, winL, window, overlap) 
 
     halfX = np.array([])
     newX = np.array([])
@@ -19,9 +19,9 @@ def bandQuant(x,winL,nbits,H, window): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
     A4 = A1/8
     A5 = A1/16
 
-    for i in range(0,len(audiodft), H):
+    for i in range(0,int(len(x)/winL)):
 
-        frame = audiodft[i:i + winL]
+        frame = audiodft[i*winL:(i+1)*winL]
 
         # Separate each frame in frequency bands
         # We are only using half dft. We first divide in freq bands or octaves and then quantize and do the synthesis
@@ -52,9 +52,7 @@ def bandQuant(x,winL,nbits,H, window): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
         fb4_Q = np.array(fb4_Q_Re) + 1j*np.array(fb4_Q_Imag)
         fb5_Q = np.array(fb5_Q_Re) + 1j*np.array(fb5_Q_Imag)
 
-        print(fb1_Q)
         # Half spectrum quantized
-
         halfX = np.concatenate([fb1_Q,fb2_Q,fb3_Q,fb4_Q,fb5_Q])
         # We flip the spectrum and do the conjugate to get te full spectrum
         newX = np.append(halfX, halfX[::-1].conj())

@@ -9,8 +9,8 @@ def quantimaxmin(A,bits,Amax,Amin):
         # level: Quantization level
 
     # Make the signal vary between values within the range -xsc and xsc
-    Amaxmed = np.array(Amax)*5
-    Aminmed = np.array(Amin)*5
+    Amaxmed = Amax*5
+    Aminmed = Amin*5
     xsc = (Amaxmed-Aminmed)
     A2 = A - (Amaxmed + Aminmed)
 
