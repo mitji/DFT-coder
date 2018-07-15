@@ -15,7 +15,7 @@ import soundfile as sf
 winL= 1024
 H = 0.5 									# Hop size --> H=1(NO overlap), H=0.5(50% overlap)
 #fsaudio, audio = wavfile.read('es01_m44.wav')
-audio, fsaudio = sf.read('es01_m44.wav')
+audio, fsaudio = sf.read('WAVS/es01_m44.wav')
 #audio = audio/max(audio) #normalize
 lenAudio = len(audio)
 
