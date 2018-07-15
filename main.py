@@ -2,7 +2,7 @@ from scipy.fftpack import fft, ifft
 from scipy.io import wavfile
 import numpy as np
 import matplotlib.pyplot as plt
-import soundfile as sf
+from scipy.io import wavfile
 from bandQuant import bandQuant
 from analSynth import dft, invDFT
 from energyQuantizer import energyQuantizer
@@ -12,10 +12,9 @@ from energyQuantizer import energyQuantizer
 
 	# Defining variables
 winL= 1024
-fs = 44100
 H = 0.5 									# Hop size --> H=1(NO overlap), H=0.5(50% overlap)
-audio, fsaudio = sf.read('es01_m44.wav')
-print(min(abs(audio))) #normalize
+fsaudio, audio = wavfile.read('es01_m44.wav')
+audio = audio/max(audio) #normalize
 lenAudio = len(audio)
 
 	# Defining windows
@@ -71,7 +70,7 @@ sX.plot(waveOut); sX.set_title('Synthesized')
 #plt.show()
 '''
 
-wavfile.write("waveOut.wav",fs, waveOut)
+wavfile.write("waveOut.wav",fsaudio, waveOut)
 
 
 # EX2 - Design of the frequency bands ------------------------------------------------------------------------------
@@ -81,10 +80,10 @@ wavfile.write("waveOut.wav",fs, waveOut)
 nbits = 8
 
 waveOut2 = bandQuant(audio,winL,nbits,window,overlap)
-wavfile.write("waveOut2.wav",fs, waveOut2)
+wavfile.write("waveOut2.wav",fsaudio, waveOut2)
 # Compute bitrate
 nsamples = len(waveOut2)
-bitrate = (8*2*5*(len(audiodft)/winL))/fs
+bitrate = (8*2*5*(len(audiodft)/winL))/fsaudio
 print('BITRATE --->', bitrate)
 
 
@@ -92,15 +91,17 @@ print('BITRATE --->', bitrate)
 
 overlap = 1
 waveOut_OvAdd = bandQuant(audio,winL,nbits,window,overlap)
-wavfile.write("waveOut_OvAdd.wav",fs, waveOut_OvAdd)
+wavfile.write("waveOut_OvAdd.wav",fsaudio, waveOut_OvAdd)
 
 
 
  # EX5 - Variable Bit Allocation ----------------------------------------------------------------------
 
-bitstream = energyQuantizer(audio,winL,window,overlap)
+bitstream, waveOut_freqBands = energyQuantizer(audio,winL,window,overlap)
 
 print('Bitstream (bits): ', bitstream)
+wavfile.write("waveOut_freqBands.wav",fsaudio, waveOut_freqBands)
+
 
 
 
