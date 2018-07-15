@@ -60,7 +60,7 @@ def bandQuant(x,winL,nbits,window, overlap): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
         print("bandquantt LEEENN: ",np.shape(newX))
 
         #ifft
-        waveOut = np.append(waveOut,(ifft(newX).real)*window)
+        waveOut = np.append(waveOut,(ifft(newX).real)/window)
 
     
     return waveOut

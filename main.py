@@ -6,6 +6,7 @@ from scipy.io import wavfile
 from bandQuant import bandQuant
 from analSynth import dft, invDFT
 from energyQuantizer import energyQuantizer
+import soundfile as sf
 
 
 # EX1 - Block Transform ------------------------------------------------------------------------
@@ -13,13 +14,15 @@ from energyQuantizer import energyQuantizer
 	# Defining variables
 winL= 1024
 H = 0.5 									# Hop size --> H=1(NO overlap), H=0.5(50% overlap)
-fsaudio, audio = wavfile.read('es01_m44.wav')
-audio = audio/max(audio) #normalize
+#fsaudio, audio = wavfile.read('es01_m44.wav')
+audio, fsaudio = sf.read('es01_m44.wav')
+print(fsaudio)
+#audio = audio/max(audio) #normalize
 lenAudio = len(audio)
 
 	# Defining windows
-#window = np.hanning(winL)
-window = np.blackman(winL);
+window = np.hanning(winL)
+#window = np.blackman(winL)
 #window = np.ones((winL),float)   			# Rectangular Window
 
 #plt.plot(window/window)

@@ -37,7 +37,7 @@ def invDFT(dft,winL,window,overlap):
         invHalfDFT = halfDFT[:1:-1]
         print('invhalfDFT shape', invHalfDFT.shape)
         mirrordft = np.append(halfDFT, invHalfDFT.conj())
-        waveOut = np.append(waveOut, (ifft(mirrordft).real)/window)
+        waveOut = np.append(waveOut, (ifft(mirrordft).real)*window)
 
     return waveOut
 
