@@ -29,15 +29,15 @@ def invDFT(dft,winL,window,overlap):
     halfWin = int(math.ceil(winL/2))
     for i in range(0, int(len(dft)/winL)):
         if overlap==0:
-            halfDFT = dft[i*winL:(i*winL)+halfWin]
+            halfDFT = dft[i*winL:(i*winL)+halfWin+1]
             print('halfDFT shape', halfDFT.shape)
         else:
-            halfDFT = dft[int(i*0.5*winL):int(i*0.5*winL)+halfWin]
+            halfDFT = dft[int(i*0.5*winL):int(i*0.5*winL)+halfWin+1]
         
-        invHalfDFT = halfDFT[:0:-1]
+        invHalfDFT = halfDFT[:1:-1]
         print('invhalfDFT shape', invHalfDFT.shape)
         mirrordft = np.append(halfDFT, invHalfDFT.conj())
-        #waveOut = np.append(waveOut, (ifft(mirrordft).real)*window)
+        waveOut = np.append(waveOut, (ifft(mirrordft).real)/window)
 
     return waveOut
 

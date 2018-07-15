@@ -20,10 +20,10 @@ lenAudio = len(audio)
 
 	# Defining windows
 #window = np.hanning(winL)
-#window = np.blackman(winL);
-window = np.ones((winL),float)   			# Rectangular Window
+window = np.blackman(winL);
+#window = np.ones((winL),float)   			# Rectangular Window
 
-#plt.plot(window*window)
+#plt.plot(window/window)
 #plt.show()
 
 	# Declare auxiliar variables
