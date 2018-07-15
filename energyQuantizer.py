@@ -16,13 +16,12 @@ def energyQuantizer(audio,winL,window,overlap):
     ampBand = np.array([A1,A2,A3,A4,A5])
 
     numFrames = int(len(audiodft)/winL)
-    isBandCoded = np.zeros(shape = (numFrames,5))       # (metadata) Binary matrix that will contain the info of whether a band is coded or not (0=no, 1=yes)
-    quantReal = np.zeros(shape = (numFrames,5))         # Matrix where the real part of each coded band will be saved
+    isBandCoded = np.zeros(shape = (numFrames, 5))
     quantImag = np.zeros(shape = (numFrames,5))         # Matrix where the imaginary part of each coded band will be saved
     bitstream = 0                                       # Variable with the length of the bitstream coded
     energyThr = 100                                     # Value chosen randomly to define the threshold
     #quantReal1 = np.zeros(numFrames,int(winL/32))
-    decAmpBand = np.zeros(5)                            # Dequantized frequency band array where we will store the decoded bands in order to sinthetize it later
+    decAmpBand = np.zeros(5)                            
     halfX = np.array([])                                # Will allocate the half spectrum after decoder
     waveOut_freqBands = np.array([])                              # Decoded signal
 
@@ -42,7 +41,7 @@ def energyQuantizer(audio,winL,window,overlap):
         
         for j in range(0,5):
             freqBand = bands[j]                                                     # We take the frequency band to code
-            if max(abs(freqBand))>(freqBand[j]/energyThr):
+            if max(abs(freqBand))>(ampBand[j]/energyThr):
                 isBandCoded[i,j] = 1
                 bitstream = bitstream + 1                                            # Add a bit to say if it is quantized or not    
                 # code and save real part                                           
@@ -78,7 +77,7 @@ def energyQuantizer(audio,winL,window,overlap):
         #print('heeee', isBandCoded.max())
 
         # --------- DECODER ---------
-        decAmpReal = np.array([np.zeros(len(fb1)), np.zeros(len(fb2)), np.zeros(len(fb3)),np.zeros(len(fb4)),np.zeros(len(fb5))])
+        decAmpReal = np.array([np.zeros(len(fb1)), np.zeros(len(fb2)), np.zeros(len(fb3)),np.zeros(len(fb4)),np.zeros(len(fb5))]) # Dequantized frequency band array where we will store the decoded bands in order to sinthetize it later
         halfX = np.array([])
         newX = np.array([])                             # Full spectrum of each frame
 
@@ -89,19 +88,20 @@ def energyQuantizer(audio,winL,window,overlap):
                     qAmp_Re1 = dequanti(quantReal1,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
                     qAmp_Imag1 = dequanti(quantImag1,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
                     decAmpReal[j] = np.array(qAmp_Re1) + 1j*np.array(qAmp_Imag1)
-                    print('AMPLITUDE REAL', qAmp_Re1)
-                    print('length', len(qAmp_Imag1))              
+                    #print('AMPLITUDE REAL', qAmp_Re1)
+                    #print('AMPLITUDE REAL', qAmp_Re1)
+                    #print('length', len(qAmp_Imag1))              
                 if j==1:
                     qAmp_Re2 = dequanti(quantReal2,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
                     qAmp_Imag2 = dequanti(quantImag2,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
-                    print('AMPLITUDE REAL', qAmp_Re2)
+                    #print('AMPLITUDE REAL', qAmp_Re2)
                     decAmpReal[j] = np.array(qAmp_Re2) + 1j*np.array(qAmp_Imag2)
-                    print('length', len(qAmp_Imag2))              
+                    #print('length', len(qAmp_Imag2))              
                 if j==2:
                     qAmp_Re3 = dequanti(quantReal3,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
                     qAmp_Imag3 = dequanti(quantImag3,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
-                    #decAmpReal[j] = np.array(qAmp_Re3) + 1j*np.array(qAmp_Imag3)  
-                    print('length', len(qAmp_Imag3))              
+                    decAmpReal[j] = np.array(qAmp_Re3) + 1j*np.array(qAmp_Imag3)  
+                    #print('length', len(qAmp_Imag3))              
                 if j==3:
                     qAmp_Re4 = dequanti(quantReal4,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
                     qAmp_Imag4 = dequanti(quantImag4,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
@@ -110,13 +110,13 @@ def energyQuantizer(audio,winL,window,overlap):
                     qAmp_Re5 = dequanti(quantReal5,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
                     qAmp_Imag5 = dequanti(quantImag5,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
                     decAmpReal[j] = np.array(qAmp_Re5) + 1j*np.array(qAmp_Imag5)
-            else:
-                decAmpBand[j] = 0            #if it is not decoded, we put 0's in all values
-        print('Decoder with no errors')
 
-        #halfX = np.concatenate([decAmpBand[0],decAmpBand[1],decAmpBand[2],decAmpBand[3],decAmpBand[4]])    # Here we have the half dft with all the bands decoded     
-        #newX = np.append(halfX, halfX[::-1].conj())                                                        # We flip the spectrum and do the conjugate to get te full spectrum        
+        print('Decoded with no errors')
+
+        halfX = np.concatenate([decAmpBand[0],decAmpBand[1],decAmpBand[2],decAmpBand[3],decAmpBand[4]])    # Here we have the half dft with all the bands decoded     
+        #newX = np.append(halfX, halfX[:1:-1].conj())                                                        # We flip the spectrum and do the conjugate to get te full spectrum        
         #waveOut_freqBands = np.append(waveOut,ifft(newX).real)                                                       # Compute IDFT
+        print('Length halfX: ', len(halfX))
     
     return bitstream
 
