@@ -7,7 +7,6 @@ def energyQuantizer(audio,winL,window,overlap):
 
     audiodft = dft(audio,winL,window,overlap)
 
-
     # Define the amplitudes for each band
     A1 = int(np.sqrt(winL))
     A2 = A1/2
@@ -21,11 +20,16 @@ def energyQuantizer(audio,winL,window,overlap):
     quantReal = np.zeros(shape = (numFrames,5))         # Matrix where the real part of each coded band will be saved
     quantImag = np.zeros(shape = (numFrames,5))         # Matrix where the imaginary part of each coded band will be saved
     bitstream = 0                                       # Variable with the length of the bitstream coded
-    energyThr = 100                                      # Value chosen randomly to define the threshold
+    energyThr = 100                                     # Value chosen randomly to define the threshold
     #quantReal1 = np.zeros(numFrames,int(winL/32))
-    decAmpBand = np.zeros(shape = 5)                  # Dequantized frequency band array where we will store the decoded bands in order to sinthetize it later
-   
+    decAmpBand = np.zeros(5)                            # Dequantized frequency band array where we will store the decoded bands in order to sinthetize it later
+    halfX = np.array([])                                # Will allocate the half spectrum after decoder
+    waveOut_freqBands = np.array([])                              # Decoded signal
+
     for i in range(0,numFrames):
+        decAmpReal = np.array([])
+        halfX = np.array([])
+        newX = np.array([])                             # Full spectrum of each frame
 
         # --------- CODER ---------
         frame = audiodft[i*winL:(i+1)*winL]
@@ -49,7 +53,7 @@ def energyQuantizer(audio,winL,window,overlap):
                 bitstream = bitstream + nbits
                 _,Qlevel_Im = quantimaxmin(freqBand.imag,nbits,ampBand[j],-ampBand[j])
                 bitstream = bitstream + nbits
-                print('Band ampl', freqBand.shape)                                                  
+                #print('Band ampl', freqBand.shape)                                                  
 
                 if j==0:
                     quantReal1 = Qlevel_Re
@@ -74,40 +78,43 @@ def energyQuantizer(audio,winL,window,overlap):
                 bitstream = bitstream + 1
         # --------- END OF CODER ---------
         print('Coder with no errors')
-        print('heeee', isBandCoded.max())
+        #print('heeee', isBandCoded.max())
 
         # --------- DECODER ---------
     
         for j in range(0,5):
             if isBandCoded[i,j] == 1:                                                # Check if the band has been coded. If yes, we decode it
                 nbits = 8
-                # Decode amplitude real part
-                Qlevel = quantReal[i,j]
-                qAmp_Re = dequanti(Qlevel,nbits,ampBand[j],-ampBand[j])
-                # Decode ammplitude imaginary part
-                Qlevel = quantImag[i,j]
-                qAmp_Imag = dequanti(Qlevel,nbits,ampBand[j],-ampBand[j])
-                # We add Real and Imaginary parts band by band
-                decodedAmplitued = np.array(qAmp_Re) + 1j*np.array(qAmp_Imag)        # Decoded Amplitude of the band
                 if j==0:
-                    decAmpBand[j] = decodedAmplitued
-                    print('AMPLITUDE', decodedAmplitued)
+                    qAmp_Re1 = dequanti(quantReal1,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
+                    qAmp_Imag1 = dequanti(quantImag1,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
+                    #decAmpReal[j] = np.array(qAmp_Re1) + 1j*np.array(qAmp_Imag1)
+                    print('AMPLITUDE REAL', qAmp_Re1)
                 if j==1:
-                    decAmpBand[j] = decodedAmplitued
+                    qAmp_Re2 = dequanti(quantReal2,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
+                    qAmp_Imag2 = dequanti(quantImag2,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
+                    print('AMPLITUDE REAL', qAmp_Re2)
+                    #decAmpReal[j] = np.array(qAmp_Re2) + 1j*np.array(qAmp_Imag2)
                 if j==2:
-                    decAmpBand[j] = decodedAmplitued
+                    qAmp_Re3 = dequanti(quantReal3,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
+                    qAmp_Imag3 = dequanti(quantImag3,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
+                    decAmpReal[j] = np.array(qAmp_Re3) + 1j*np.array(qAmp_Imag3)                
                 if j==3:
-                    decAmpBand[j] = decodedAmplitued
+                    qAmp_Re4 = dequanti(quantReal4,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
+                    qAmp_Imag4 = dequanti(quantImag4,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
+                    decAmpReal[j] = np.array(qAmp_Re4) + 1j*np.array(qAmp_Imag4)
                 if j==4:
-                    decAmpBand[j] = decodedAmplitued
-            '''else:
-                decAmpBand[j] = np.zeros(shape = bands[j].shape)      '''              #if it is not decoded, we put 0's in all values
-        
+                    qAmp_Re5 = dequanti(quantReal5,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
+                    qAmp_Imag5 = dequanti(quantImag5,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
+                    decAmpReal[j] = np.array(qAmp_Re5) + 1j*np.array(qAmp_Imag5)
+            else:
+                decAmpBand[j] = 0            #if it is not decoded, we put 0's in all values
         print('Decoder with no errors')
 
-        #halfX = np.concatenate([decAmpBand[0],decAmpBand[1],decAmpBand[2],decAmpBand[3],decAmpBand[4]])        # Here we have the half dft with all the bands decoded
-        
-
+        #halfX = np.concatenate([decAmpBand[0],decAmpBand[1],decAmpBand[2],decAmpBand[3],decAmpBand[4]])    # Here we have the half dft with all the bands decoded     
+        #newX = np.append(halfX, halfX[::-1].conj())                                                        # We flip the spectrum and do the conjugate to get te full spectrum        
+        #waveOut_freqBands = np.append(waveOut,ifft(newX).real)                                                       # Compute IDFT
+    
     return bitstream
 
 

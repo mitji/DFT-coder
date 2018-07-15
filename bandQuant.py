@@ -7,9 +7,7 @@ from analSynth import dft
 def bandQuant(x,winL,nbits,window, overlap): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
 
     audiodft = dft(x, winL, window, overlap) 
-
     halfX = np.array([])
-    newX = np.array([])
     waveOut = np.array([])
 
     # Define the amplitudes for each band
@@ -20,6 +18,7 @@ def bandQuant(x,winL,nbits,window, overlap): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
     A5 = A1/16
 
     for i in range(0,int(len(x)/winL)):
+        newX = np.array([])
 
         frame = audiodft[i*winL:(i+1)*winL]
 
@@ -55,9 +54,10 @@ def bandQuant(x,winL,nbits,window, overlap): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
         # Half spectrum quantized
         halfX = np.concatenate([fb1_Q,fb2_Q,fb3_Q,fb4_Q,fb5_Q])
         # We flip the spectrum and do the conjugate to get te full spectrum
-        newX = np.append(halfX, halfX[::-1].conj())
+        newX = np.append(halfX, halfX[:0:-1].conj())
 
         #ifft
         waveOut = np.append(waveOut,ifft(newX).real)
 
+    
     return waveOut

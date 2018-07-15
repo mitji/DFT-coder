@@ -1,6 +1,7 @@
 from scipy.fftpack import fft, ifft
 import numpy as np
 import matplotlib.pyplot as plt
+import math 
 
 # x = signal to analyze
 # winL = window size
@@ -21,19 +22,22 @@ def dft(x,winL,window,overlap):
 
     return audiodft
 
+    math.ceil(x)
 
 def invDFT(dft,winL,window,overlap):
     waveOut = np.array([])
-    halfWin = int(winL/2)
+    halfWin = int(math.ceil(winL/2))
     for i in range(0, int(len(dft)/winL)):
         if overlap==0:
             halfDFT = dft[i*winL:(i*winL)+halfWin]
+            print('halfDFT shape', halfDFT.shape)
         else:
             halfDFT = dft[int(i*0.5*winL):int(i*0.5*winL)+halfWin]
         
-        invHalfDFT = halfDFT[::-1]
+        invHalfDFT = halfDFT[:0:-1]
+        print('invhalfDFT shape', invHalfDFT.shape)
         mirrordft = np.append(halfDFT, invHalfDFT.conj())
-        waveOut = np.append(waveOut, (ifft(mirrordft).real)*window)
+        #waveOut = np.append(waveOut, (ifft(mirrordft).real)*window)
 
     return waveOut
 
