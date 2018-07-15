@@ -27,9 +27,6 @@ def energyQuantizer(audio,winL,window,overlap):
     waveOut_freqBands = np.array([])                              # Decoded signal
 
     for i in range(0,numFrames):
-        decAmpReal = np.array([])
-        halfX = np.array([])
-        newX = np.array([])                             # Full spectrum of each frame
 
         # --------- CODER ---------
         frame = audiodft[i*winL:(i+1)*winL]
@@ -40,9 +37,9 @@ def energyQuantizer(audio,winL,window,overlap):
         fb3 = frame[int(winL/16):int(winL/8)]
         fb4 = frame[int(winL/8):int(winL/4)]
         fb5 = frame[int(winL/4):int(winL/2)]
-
         bands = np.array([fb1,fb2,fb3,fb4,fb5])
         nbits = 8                                                                   # In our case we will use the same number of bits for each band
+        
         for j in range(0,5):
             freqBand = bands[j]                                                     # We take the frequency band to code
             if max(abs(freqBand))>(freqBand[j]/energyThr):
@@ -81,24 +78,30 @@ def energyQuantizer(audio,winL,window,overlap):
         #print('heeee', isBandCoded.max())
 
         # --------- DECODER ---------
-    
+        decAmpReal = np.array([np.zeros(len(fb1)), np.zeros(len(fb2)), np.zeros(len(fb3)),np.zeros(len(fb4)),np.zeros(len(fb5))])
+        halfX = np.array([])
+        newX = np.array([])                             # Full spectrum of each frame
+
         for j in range(0,5):
             if isBandCoded[i,j] == 1:                                                # Check if the band has been coded. If yes, we decode it
                 nbits = 8
                 if j==0:
                     qAmp_Re1 = dequanti(quantReal1,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
                     qAmp_Imag1 = dequanti(quantImag1,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
-                    #decAmpReal[j] = np.array(qAmp_Re1) + 1j*np.array(qAmp_Imag1)
+                    decAmpReal[j] = np.array(qAmp_Re1) + 1j*np.array(qAmp_Imag1)
                     print('AMPLITUDE REAL', qAmp_Re1)
+                    print('length', len(qAmp_Imag1))              
                 if j==1:
                     qAmp_Re2 = dequanti(quantReal2,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
                     qAmp_Imag2 = dequanti(quantImag2,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
                     print('AMPLITUDE REAL', qAmp_Re2)
-                    #decAmpReal[j] = np.array(qAmp_Re2) + 1j*np.array(qAmp_Imag2)
+                    decAmpReal[j] = np.array(qAmp_Re2) + 1j*np.array(qAmp_Imag2)
+                    print('length', len(qAmp_Imag2))              
                 if j==2:
                     qAmp_Re3 = dequanti(quantReal3,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
                     qAmp_Imag3 = dequanti(quantImag3,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
-                    decAmpReal[j] = np.array(qAmp_Re3) + 1j*np.array(qAmp_Imag3)                
+                    #decAmpReal[j] = np.array(qAmp_Re3) + 1j*np.array(qAmp_Imag3)  
+                    print('length', len(qAmp_Imag3))              
                 if j==3:
                     qAmp_Re4 = dequanti(quantReal4,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
                     qAmp_Imag4 = dequanti(quantImag4,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
