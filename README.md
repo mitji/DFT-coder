@@ -47,7 +47,7 @@ To run the project you just have to open your terminal, go to the project direct
 ```
 python main.py
 ```
-Once you have run it, you can listen to the generated files in the project folder.
+Once you have run it, you can listen to the generated ".wav" files in the project folder.
 
 If you want to edit it or analyze it deeper, you will only need an editor, for instance PyCharm, useful to debug and run your code (download: https://www.jetbrains.com/pycharm/download/), or otherwise if you use a plain text editor such as Sublime Text you will have to run it in the terminal.
 
