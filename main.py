@@ -16,14 +16,13 @@ winL= 1024
 H = 0.5 									# Hop size --> H=1(NO overlap), H=0.5(50% overlap)
 #fsaudio, audio = wavfile.read('es01_m44.wav')
 audio, fsaudio = sf.read('es01_m44.wav')
-print(fsaudio)
 #audio = audio/max(audio) #normalize
 lenAudio = len(audio)
 
 	# Defining windows
-window = np.hanning(winL)
+#window = np.hanning(winL)
 #window = np.blackman(winL)
-#window = np.ones((winL),float)   			# Rectangular Window
+window = np.ones((winL),float)   			# Rectangular Window
 
 #plt.plot(window/window)
 #plt.show()
@@ -32,9 +31,10 @@ window = np.hanning(winL)
 audiodft = np.array([])
 frame = np.zeros(winL)
 overlap = 0         						# In ex 1 we don't want overlap, so we write 0
+windowing = 0                               # Apply windowing = 1
 
 	# 1st step: COMPUTE DFT
-audiodft = dft(audio,winL,window,overlap)
+audiodft = dft(audio,winL,window,overlap,windowing)
 
 	# PLOTS
 numFrame = 90								# We choose a random frame for ploting purpose
@@ -63,7 +63,7 @@ mirrordft = np.zeros(winL)
 halfDFT = np.zeros(halfWin)
 waveOut = np.array([])
 
-waveOut = invDFT(audiodft,winL,window,overlap)
+waveOut = invDFT(lenAudio,audiodft,winL,window,overlap,windowing)
 
 '''
 #Plotting original waveform and synthesized one
@@ -80,29 +80,29 @@ wavfile.write("waveOut.wav",fsaudio, waveOut)
 # Defining bands --> inside freq bandQuantizer
 # EX3 - Fixed-bit allocation and Quantization ----------------------------------------------------------------------
 
-nbits = 8
+nbits = 16
 
 waveOut2 = bandQuant(audio,winL,nbits,window,overlap)
 wavfile.write("waveOut2.wav",fsaudio, waveOut2)
 # Compute bitrate
 nsamples = len(waveOut2)
-bitrate = (8*2*5*(len(audiodft)/winL))/fsaudio
-print('BITRATE --->', bitrate)
+bitrate = nbits*fsaudio
+#print('BITRATE --->', bitrate)
 
 
  # EX4 - Overlap-Add ----------------------------------------------------------------------
 
 overlap = 1
+windowing = 1
 waveOut_OvAdd = bandQuant(audio,winL,nbits,window,overlap)
 wavfile.write("waveOut_OvAdd.wav",fsaudio, waveOut_OvAdd)
 
 
-
  # EX5 - Variable Bit Allocation ----------------------------------------------------------------------
-
+overlap = 0
 bitstream, waveOut_freqBands = energyQuantizer(audio,winL,window,overlap)
 
-print('Bitstream (bits): ', bitstream)
+#print('Bitstream (bits): ', bitstream)
 wavfile.write("waveOut_freqBands.wav",fsaudio, waveOut_freqBands)
 
 

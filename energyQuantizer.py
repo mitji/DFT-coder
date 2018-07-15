@@ -7,7 +7,8 @@ from scipy.fftpack import ifft
 
 def energyQuantizer(audio,winL,window,overlap):
 
-    audiodft = dft(audio,winL,window,overlap)
+    windowing = 0
+    audiodft = dft(audio,winL,window,overlap,windowing)
 
     # Define the amplitudes for each band
     A1 = int(np.sqrt(winL))
@@ -74,7 +75,7 @@ def energyQuantizer(audio,winL,window,overlap):
                 isBandCoded[i,j] = 0
                 bitstream = bitstream + 1
         # --------- END OF CODER ---------
-        print('Coder with no errors')
+        #print('Coder with no errors')
         #print('heeee', isBandCoded.max())
 
         # --------- DECODER ---------
@@ -112,11 +113,11 @@ def energyQuantizer(audio,winL,window,overlap):
                     qAmp_Imag5 = dequanti(quantImag5,nbits,ampBand[j],-ampBand[j])   # Decode ammplitude imaginary part
                     decAmpBand[j] = np.array(qAmp_Re5) + 1j*np.array(qAmp_Imag5)
 
-        print('Decoded with no errors')
+        #print('Decoded with no errors')
 
         halfX = np.concatenate([decAmpBand[0],decAmpBand[1],decAmpBand[2],decAmpBand[3],decAmpBand[4]])    # Here we have the half dft with all the bands decoded     
         newX = np.append(halfX, halfX[::-1].conj())                                                        # We flip the spectrum and do the conjugate to get te full spectrum        
-        print('Length halfX: ', len(newX))
+        #print('Length halfX: ', len(newX))
         waveOut_freqBands = np.append(waveOut_freqBands,(ifft(newX).real)*window)                          # Compute IDFT
         
     
