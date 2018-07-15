@@ -11,15 +11,15 @@ It's a university final subject project which consists in migrating to Python an
 ### Prerequisits
 In order to have no issues with running the code, we recommend having installed python3.
 
-All the different imports needed are called in the functions. It could be necessarily to install some packages if you don't have it. That'ss an easy job, just by tipping in your terminal: 
+All the different imports needed are called in the functions. It could be necessarily to install some packages if you don't have it. That's an easy job, just by typping in your terminal: 
 ```
 pip install package-name
 ```
 
 ## Code and Project Style
-First o fall, in 'WAVS' folder there are 12 audio files for test purposes, which are part of the MPEG dataset commonly used to evaluate new coding algorithms. They contain PCM audio recordings sampled at fs=44100Hz and quantized using 16bits/sample, which makes a data rate of 705,6 Kbits/second. 
+The code is structured in a main.py file where the different parts of the incremental coder are called. There are also several plots already written. However, feel free to add plots of your choice to test the code. All the other files contain the functions needed to implement the different steps of the coder. 
 
-The code is structured in a main.py file where the different parts of the incremental coder are called. There are also several plots already writeen. However, feel free to add plots of your choice to test the code. All the other files contain the functions needed to implement the different steps of the coder. 
+First o fall, in 'WAVS' folder there are 12 audio files for test purposes, which are part of the MPEG dataset commonly used to evaluate new coding algorithms. They contain PCM audio recordings sampled at fs=44100Hz and quantized using 16bits/sample, which makes a data rate of 705,6 Kbits/second. 
 
 In the `main.py` function there are the different steps made to build the coder. Tis main code is divided in three parts.
 
