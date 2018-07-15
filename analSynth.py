@@ -15,7 +15,7 @@ def dft(x,winL,window,overlap,windowing):
     if overlap == 0:
         H = winL
     else:
-        H = int(winL/2)
+        H = int(winL/4)
 
     # Applying window and computing DFT in each frame
     for i in range(0, int(lenAudio - (lenAudio % winL/2)),H):

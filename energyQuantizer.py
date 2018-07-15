@@ -22,13 +22,14 @@ def energyQuantizer(audio,winL,window,overlap):
     isBandCoded = np.zeros(shape = (numFrames, 5))
     quantImag = np.zeros(shape = (numFrames,5))         # Matrix where the imaginary part of each coded band will be saved
     bitstream = 0                                       # Variable with the length of the bitstream coded
-    energyThr = 100                                     # Value chosen randomly to define the threshold
+    energyThr = 0.08                                   # Value chosen randomly to define the threshold
     #quantReal1 = np.zeros(numFrames,int(winL/32))
     halfX = np.array([])                                # Will allocate the half spectrum after decoder
     waveOut_freqBands = np.array([])                              # Decoded signal
 
     for i in range(0,numFrames):
 
+        bitstream = bitstream + 1                                                   # We send a bit to indicate weather the frame is sent or not
         # --------- CODER ---------
         frame = audiodft[i*winL:(i+1)*winL]
 
@@ -43,9 +44,9 @@ def energyQuantizer(audio,winL,window,overlap):
         
         for j in range(0,5):
             freqBand = bands[j]                                                     # We take the frequency band to code
-            if max(abs(freqBand))>(ampBand[j]/energyThr):
+            if max(abs(freqBand))>(ampBand[j]*energyThr):
                 isBandCoded[i,j] = 1
-                bitstream = bitstream + 1                                            # Add a bit to say if it is quantized or not    
+                bitstream = bitstream + 1                                           # Add a bit to say that it is coded    
                 # code and save real part                                           
                 _,Qlevel_Re = quantimaxmin(freqBand.real,nbits,ampBand[j],-ampBand[j])
                 bitstream = bitstream + nbits
@@ -73,7 +74,7 @@ def energyQuantizer(audio,winL,window,overlap):
                     #print('hey Im in')
             else:
                 isBandCoded[i,j] = 0
-                bitstream = bitstream + 1
+                bitstream = bitstream + 1                                           # Add a bit to say that it is not coded
         # --------- END OF CODER ---------
         #print('Coder with no errors')
         #print('heeee', isBandCoded.max())

@@ -80,14 +80,14 @@ wavfile.write("waveOut.wav",fsaudio, waveOut)
 # Defining bands --> inside freq bandQuantizer
 # EX3 - Fixed-bit allocation and Quantization ----------------------------------------------------------------------
 
-nbits = 16
+nbits = 8								
 
 waveOut2 = bandQuant(audio,winL,nbits,window,overlap)
 wavfile.write("waveOut2.wav",fsaudio, waveOut2)
 # Compute bitrate
 nsamples = len(waveOut2)
 bitrate = nbits*fsaudio
-#print('BITRATE --->', bitrate)
+print('BITRATE exercise 3 --->', bitrate/1000, ' kb/s')
 
 
  # EX4 - Overlap-Add ----------------------------------------------------------------------
@@ -96,6 +96,10 @@ overlap = 1
 windowing = 1
 waveOut_OvAdd = bandQuant(audio,winL,nbits,window,overlap)
 wavfile.write("waveOut_OvAdd.wav",fsaudio, waveOut_OvAdd)
+num_windows = int(lenAudio/(int(winL)/2))							# Number of windows with overlapp-add of factor 2
+nbits_total = nbits * winL  * num_windows
+bitrate2 = (nbits_total * fsaudio) / lenAudio
+print('BITRATE exercise 4 (Overlap-Add) --->', '%.2f' %(bitrate2/1000), 'kb/s')
 
 
  # EX5 - Variable Bit Allocation ----------------------------------------------------------------------
@@ -103,7 +107,10 @@ overlap = 0
 bitstream, waveOut_freqBands = energyQuantizer(audio,winL,window,overlap)
 
 #print('Bitstream (bits): ', bitstream)
-wavfile.write("waveOut_freqBands.wav",fsaudio, waveOut_freqBands)
+wavfile.write("waveOut_freqBands.wav",fsaudio, waveOut_freqBands)					
+bitrate3 = (bitstream / lenAudio) * fsaudio
+print('BITRATE exercise 5 (Variable Bit Allocation) --->', '%.2f' %(bitrate3/1000), 'kb/s')
+
 
 
 
