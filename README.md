@@ -56,7 +56,7 @@ Once you have run it, you can listen to the generated ".wav" files in the projec
 
 If you want to edit it or analyze it deeper, you will only need an editor, for instance PyCharm, useful to debug and run your code (download: https://www.jetbrains.com/pycharm/download/), or otherwise if you use a plain text editor such as Sublime Text you will have to run it in the terminal.
 
-Some parameters you can modify and test with are the analysis window size `N`, the number of bits `nbits` to quantize the signal, the `window type` (rectangular, hanning, blackman...), the `overlapp` factor to the DFT , etc. (Open the code and play a little bit ;)).
+Some parameters you can modify and test with are the analysis window size `N`, the number of bits `nbits` to quantize the signal, the `window type` (rectangular, hanning, blackman...), the `overlapp` factor of the FFT, etc. (Open the code and play a little bit ;)).
 
 ## Authors
 [David Mitjana](https://github.com/mitji) and [Oriol Nadal](https://github.com/oriolnadal)
