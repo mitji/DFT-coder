@@ -7,7 +7,7 @@ The objective of this project is to implement a `DFT-based audio coder` that can
 
 It's a university final subject project which consists in migrating to Python and improving a DFT-coder written in Matlab we made during the subject.
 
-### DFT - Coder Block Diagram
+### DFT - Coder: Block Diagram
 
 ![alt text](https://github.com/mitji/DFT-coder/blob/master/DFT_coder_schema.png)
 
