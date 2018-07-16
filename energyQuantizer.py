@@ -8,6 +8,12 @@ from scipy.fftpack import ifft
 def energyQuantizer(audio,winL,window,overlap):
 
     windowing = 0
+
+    if overlap == 0:
+        H = winL            # No overlap
+    else:
+        H = int(winL/2)     # If we want overlap of factor 2   
+
     audiodft = dft(audio,winL,window,windowing)
 
     # Define the amplitudes for each band
@@ -19,21 +25,20 @@ def energyQuantizer(audio,winL,window,overlap):
     ampBand = np.array([A1,A2,A3,A4,A5])
 
     numFrames = int(len(audiodft)/winL)
-    isBandCoded = np.zeros(shape = (numFrames, 5))      # Matrix where we save the bits that inform if a band is coded or not
-    quantImag = np.zeros(shape = (numFrames,5))         # Matrix where the imaginary part of each coded band will be saved
+    isBandCoded = np.zeros(5)      # Matrix where we save the bits that inform if a band is coded or not
     bitstream = 0                                       # Variable with the length of the bitstream coded
-    energyThr = 0.08                                    # Value chosen randomly to define the threshold
-    #quantReal1 = np.zeros(numFrames,int(winL/32))
+    energyThr = 0.0001                                  # Value chosen randomly to define the threshold
     halfX = np.array([])                                # Will allocate the half spectrum after decoder
-    waveOut_freqBands = np.array([])                    # Decoded signal
+    waveOut_freqBands =np.zeros(len(audio))                    # Decoded signal
 
-    for i in range(0,numFrames):
+    for i in range(0,int(len(audiodft)),H):
 
         bitstream = bitstream + 1                                                   # We send a bit to indicate weather the frame is sent or not
         
         # --------- CODER ---------
         
-        frame = audiodft[i*winL:(i+1)*winL]
+        frame = audiodft[i:i+winL]
+        if(len(frame)!=1024): break
 
         # Separate each frame in frequency bands
         fb1 = frame[0:int(winL/32)]
@@ -47,7 +52,7 @@ def energyQuantizer(audio,winL,window,overlap):
         for j in range(0,5):
             freqBand = bands[j]                                                     # We take the frequency band to code
             if max(abs(freqBand))>(ampBand[j]*energyThr):
-                isBandCoded[i,j] = 1
+                isBandCoded[j] = 1
                 bitstream = bitstream + 1                                           # Add a bit to say that it is coded    
                 # code and save real part                                           
                 _,Qlevel_Re = quantimaxmin(freqBand.real,nbits,ampBand[j],-ampBand[j])
@@ -72,7 +77,7 @@ def energyQuantizer(audio,winL,window,overlap):
                     quantReal5 = Qlevel_Re
                     quantImag5 = Qlevel_Im
             else:
-                isBandCoded[i,j] = 0
+                isBandCoded[j] = 0
                 bitstream = bitstream + 1                                           # Add a bit to say that it is not coded
         
         # --------- END OF CODER ---------
@@ -85,7 +90,7 @@ def energyQuantizer(audio,winL,window,overlap):
         newX = np.array([])                                                         # Full spectrum of each frame
 
         for j in range(0,5):
-            if isBandCoded[i,j] == 1:                                                # Check if the band has been coded. If yes, we decode it
+            if isBandCoded[j] == 1:                                                # Check if the band has been coded. If yes, we decode it
                 nbits = 8
                 if j==0:
                     qAmp_Re1 = dequanti(quantReal1,nbits,ampBand[j],-ampBand[j])     # Decode amplitude real part
@@ -113,8 +118,10 @@ def energyQuantizer(audio,winL,window,overlap):
 
         halfX = np.concatenate([decAmpBand[0],decAmpBand[1],decAmpBand[2],decAmpBand[3],decAmpBand[4]])    # Here we have the half dft with all the bands decoded     
         newX = np.append(halfX, halfX[::-1].conj())                                                        # We flip the spectrum and do the conjugate to get te full spectrum        
-        waveOut_freqBands = np.append(waveOut_freqBands,(ifft(newX).real)*window)                          # Compute IDFT
-        
+        if windowing == 1:
+            waveOut_freqBands[i:i + winL] = (ifft(newX).real) * window               # IFFT
+        else:
+            waveOut_freqBands[i:i + winL] = (ifft(newX).real)             
     
     return bitstream, waveOut_freqBands
 

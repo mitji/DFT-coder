@@ -78,13 +78,21 @@ wavfile.write("waveOut.wav",fsaudio, waveOut)
 # EX3 - Fixed-bit allocation and Quantization ----------------------------------------------------------------------
 
 nbits = 8								
-windowing = 1
+windowing = 0.     # in this stage we don't apply window
 waveOut2 = bandQuant(audio,winL,nbits,window,overlap,windowing)
 wavfile.write("waveOut2.wav",fsaudio, waveOut2)
 	# Compute bitrate
 nsamples = len(waveOut2)
 bitrate = nbits*fsaudio
 print('BITRATE exercise 3 --->', bitrate/1000, ' kb/s')
+
+'''
+fig4, (oX,sX) = plt.subplots(2,1)
+oX.plot(audio); oX.set_title('Original')
+sX.plot(waveOut); sX.set_title('Synthesized after Band Quantization')
+plt.show()
+'''
+
 
 
  # EX4 - Overlap-Add ----------------------------------------------------------------------
@@ -99,6 +107,14 @@ nbits_total = nbits * winL  * num_windows
 bitrate2 = (nbits_total * fsaudio) / lenAudio
 print('BITRATE exercise 4 (Overlap-Add) --->', '%.2f' %(bitrate2/1000), 'kb/s')
 
+'''
+fig5, (oX,sX) = plt.subplots(2,1)
+oX.plot(audio); oX.set_title('Original')
+sX.plot(waveOut_OvAdd); sX.set_title('Synthesized with Windowing and Ov-Add')
+plt.show()
+'''
+
+
 
 	# EX5 - Variable Bit Allocation ----------------------------------------------------------------------
 overlap = 0
@@ -109,6 +125,12 @@ wavfile.write("waveOut_freqBands.wav",fsaudio, waveOut_freqBands)
 bitrate3 = (bitstream / lenAudio) * fsaudio
 print('BITRATE exercise 5 (Variable Bit Allocation) --->', '%.2f' %(bitrate3/1000), 'kb/s')
 
+'''
+fig6, (oX,sX) = plt.subplots(2,1)
+oX.plot(audio); oX.set_title('Original')
+sX.plot(waveOut_freqBands); sX.set_title('Synthesized with Energy Quantization')
+plt.show()
+'''
 
 
 

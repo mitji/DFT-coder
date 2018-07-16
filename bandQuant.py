@@ -20,7 +20,7 @@ def bandQuant(x,winL,nbits,window, overlap,windowing):
     if overlap == 0:
         H = winL            # No overlap
     else:
-        H = int(winL/4)     # If we want overlap of factor 2
+        H = int(winL/2)     # If we want overlap of factor 2
 
     for i in range(0,int(len(audiodft)),H):
         newX = np.array([])
