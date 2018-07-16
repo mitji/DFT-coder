@@ -1,20 +1,18 @@
 from scipy.fftpack import fft, ifft
-from scipy.io import wavfile
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
+import soundfile as sf
 from bandQuant import bandQuant
 from analSynth import dft, invDFT
 from energyQuantizer import energyQuantizer
-import soundfile as sf
 
 
 # EX1 - Block Transform ------------------------------------------------------------------------
 
 	# Defining variables
 winL= 1024
-H = 0.5 									# Hop size --> H=1(NO overlap), H=0.5(50% overlap)
-#fsaudio, audio = wavfile.read('es01_m44.wav')
+H = 0.5 										# Hop size --> H=1(NO overlap), H=0.5(50% overlap)
 audio, fsaudio = sf.read('WAVS/es01_m44.wav')
 #audio = audio/max(audio) #normalize
 lenAudio = len(audio)
@@ -24,17 +22,14 @@ lenAudio = len(audio)
 #window = np.blackman(winL)
 window = np.ones((winL),float)   			# Rectangular Window
 
-#plt.plot(window/window)
-#plt.show()
 
 	# Declare auxiliar variables
 audiodft = np.array([])
 frame = np.zeros(winL)
-overlap = 0         						# In ex 1 we don't want overlap, so we write 0
 windowing = 0                               # Apply windowing = 1
 
 	# 1st step: COMPUTE DFT
-audiodft = dft(audio,winL,window,overlap,windowing)
+audiodft = dft(audio,winL,window,windowing)
 
 	# PLOTS
 numFrame = 90								# We choose a random frame for ploting purpose
@@ -63,10 +58,12 @@ mirrordft = np.zeros(winL)
 halfDFT = np.zeros(halfWin)
 waveOut = np.array([])
 
+overlap = 0
+
 waveOut = invDFT(lenAudio,audiodft,winL,window,overlap,windowing)
 
 '''
-#Plotting original waveform and synthesized one
+	# Plotting original and synthesized waveform
 fig3, (oX,sX) = plt.subplots(2,1)
 oX.plot(audio); oX.set_title('Original')
 sX.plot(waveOut); sX.set_title('Synthesized')
@@ -81,10 +78,10 @@ wavfile.write("waveOut.wav",fsaudio, waveOut)
 # EX3 - Fixed-bit allocation and Quantization ----------------------------------------------------------------------
 
 nbits = 8								
-
-waveOut2 = bandQuant(audio,winL,nbits,window,overlap)
+windowing = 1
+waveOut2 = bandQuant(audio,winL,nbits,window,overlap,windowing)
 wavfile.write("waveOut2.wav",fsaudio, waveOut2)
-# Compute bitrate
+	# Compute bitrate
 nsamples = len(waveOut2)
 bitrate = nbits*fsaudio
 print('BITRATE exercise 3 --->', bitrate/1000, ' kb/s')
@@ -94,15 +91,16 @@ print('BITRATE exercise 3 --->', bitrate/1000, ' kb/s')
 
 overlap = 1
 windowing = 1
-waveOut_OvAdd = bandQuant(audio,winL,nbits,window,overlap)
+waveOut_OvAdd = bandQuant(audio,winL,nbits,window,overlap,windowing)
 wavfile.write("waveOut_OvAdd.wav",fsaudio, waveOut_OvAdd)
+	# Compute bitrate
 num_windows = int(lenAudio/(int(winL)/2))							# Number of windows with overlapp-add of factor 2
 nbits_total = nbits * winL  * num_windows
 bitrate2 = (nbits_total * fsaudio) / lenAudio
 print('BITRATE exercise 4 (Overlap-Add) --->', '%.2f' %(bitrate2/1000), 'kb/s')
 
 
- # EX5 - Variable Bit Allocation ----------------------------------------------------------------------
+	# EX5 - Variable Bit Allocation ----------------------------------------------------------------------
 overlap = 0
 bitstream, waveOut_freqBands = energyQuantizer(audio,winL,window,overlap)
 

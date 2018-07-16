@@ -21,7 +21,6 @@ def quantimaxmin(A,bits,Amax,Amin):
 
     ampQ = ampQ * xsc * (2 ** (1 - bits))
 
-    # Return to the original amplitudes
     ampQ = ampQ + (Amaxmed + Aminmed)
 
     return ampQ, level

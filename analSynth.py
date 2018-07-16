@@ -7,19 +7,16 @@ import math
 # winL = window size
 # window = window type
 # overlap = boolean to apply overlap-add or not. If we decide to apply it, we make a hop size 1/2 of winL (window size)
+# windowing = boolean to apply windowing or not
 
-def dft(x,winL,window,overlap,windowing):
+def dft(x,winL,window,windowing):
     lenAudio = len(x)
     audiodft = np.array([])
 
-    if overlap == 0:
-        H = winL
-    else:
-        H = int(winL/4)
+    H = winL            # Hop size
 
     # Applying window and computing DFT in each frame
     for i in range(0, int(lenAudio - (lenAudio % winL/2)),H):
-        #print(winL)
         if(len(x[i:i+winL])!=1024): break
 
         if windowing == 1:
@@ -39,18 +36,14 @@ def invDFT(lenAudio,dft,winL,window,overlap,windowing):
     if overlap == 0:
         H = winL
     else:
-        H = int(winL / 2)
+        H = int(winL/2)
 
     for i in range(0, int(len(dft)), H):
         halfDFT = dft[i:i+halfWin+1]
-        #print('halfDFT shape', halfDFT.shape)
-
         invHalfDFT = halfDFT[:1:-1]
-        #print('invhalfDFT shape', invHalfDFT.shape)
         mirrordft = np.append(halfDFT, invHalfDFT.conj())
         #waveOut = np.append(waveOut, (ifft(mirrordft).real)*window)
         #print(waveOut[i:i+winL])
-        waveOut[i:i+winL] = (ifft(mirrordft).real)*window
         if windowing == 1:
             waveOut[i:i + winL] = (ifft(mirrordft).real) * window
         else:

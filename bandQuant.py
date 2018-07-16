@@ -4,12 +4,11 @@ from quantimaxmin import quantimaxmin
 from analSynth import dft
 
 
-def bandQuant(x,winL,nbits,window, overlap): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
+def bandQuant(x,winL,nbits,window, overlap,windowing):
 
-    windowing = 0
-    audiodft = dft(x, winL, window, overlap, windowing)
+    audiodft = dft(x, winL, window, windowing)
     halfX = np.array([])
-    waveOut = np.array([])
+    waveOut = np.zeros(len(x))
 
     # Define the amplitudes for each band
     A1 = int(np.sqrt(winL))
@@ -18,14 +17,18 @@ def bandQuant(x,winL,nbits,window, overlap): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
     A4 = A1/8
     A5 = A1/16
 
-    for i in range(0,int(len(x)/winL)):
-        newX = np.array([])
+    if overlap == 0:
+        H = winL            # No overlap
+    else:
+        H = int(winL/4)     # If we want overlap of factor 2
 
-        frame = audiodft[i*winL:(i+1)*winL]
-        #print("FRAME: ", len(frame))
+    for i in range(0,int(len(audiodft)),H):
+        newX = np.array([])
+        frame = audiodft[i:i+winL]
+        if(len(frame)!=1024): break
 
         # Separate each frame in frequency bands
-        # We are only using half dft. We first divide in freq bands or octaves and then quantize and do the synthesis
+        # We are only using half dft. We first divide in freq bands and then quantize and do the synthesis
         fb1 = frame[0:int(winL/32)]
         fb2 = frame[int(winL/32):int(winL/16)]
         fb3 = frame[int(winL/16):int(winL/8)]
@@ -53,15 +56,11 @@ def bandQuant(x,winL,nbits,window, overlap): #LI CANVIEM EL NOM A LA FUNCIÓ¿?
         fb4_Q = np.array(fb4_Q_Re) + 1j*np.array(fb4_Q_Imag)
         fb5_Q = np.array(fb5_Q_Re) + 1j*np.array(fb5_Q_Imag)
 
-        # Half spectrum quantized
-        halfX = np.concatenate([fb1_Q,fb2_Q,fb3_Q,fb4_Q,fb5_Q])
-        #print("halfXXX LEEENN: ", np.shape(halfX))
-        # We flip the spectrum and do the conjugate to get te full spectrum
-        newX = np.append(halfX, halfX[::-1].conj())
-        #print("bandquantt LEEENN: ",np.shape(newX))
-
-        #ifft
-        waveOut = np.append(waveOut,(ifft(newX).real)/window)
-
+        halfX = np.concatenate([fb1_Q,fb2_Q,fb3_Q,fb4_Q,fb5_Q])                 # Half spectrum quantized
+        newX = np.append(halfX, halfX[::-1].conj())                             # We flip the spectrum and do the conjugate to get te full spectrum
+        if windowing == 1:
+            waveOut[i:i + winL] = (ifft(newX).real) * window               # IFFT
+        else:
+            waveOut[i:i + winL] = (ifft(newX).real)                      
     
     return waveOut
